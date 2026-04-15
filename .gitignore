@@ -1,0 +1,9 @@
+node_modules/
+.next/
+coverage/
+playwright-report/
+test-results/
+.env
+prisma/dev.db
+prisma/dev.db-journal
+decisions.md
