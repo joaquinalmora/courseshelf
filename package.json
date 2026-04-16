@@ -2,13 +2,15 @@
   "name": "courseshelf",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "react-router dev --host 0.0.0.0 --port 8000",
+    "build": "react-router build",
+    "start": "PORT=8000 react-router-serve ./build/server/index.js",
     "test": "vitest",
     "test:run": "vitest run",
     "e2e": "playwright test",
+    "typecheck": "react-router typegen && tsc",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --name init",
     "db:push": "prisma db push",
@@ -16,20 +18,25 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@react-router/node": "^7.14.0",
+    "@react-router/serve": "^7.14.0",
     "@prisma/client": "^6.8.2",
-    "next": "^15.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "zod": "^3.24.4"
+    "react-router": "^7.14.0",
+    "zod": "^3.24.4",
+    "isbot": "^5"
   },
   "devDependencies": {
     "@playwright/test": "^1.54.0",
+    "@react-router/dev": "^7.14.0",
     "@types/node": "^22.15.18",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "prisma": "^6.8.2",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
+    "vite": "^8.0.3",
     "vitest": "^3.1.2"
   }
 }
