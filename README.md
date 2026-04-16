@@ -4,7 +4,7 @@ CourseShelf is a full-stack web app for managing courses and their learning mate
 
 ## Stack
 
-- Next.js App Router for the frontend and backend routes
+- React Router v7 framework mode for the frontend and backend data flow
 - Prisma with SQLite for persistence
 - Vitest for unit tests
 - Playwright for end-to-end tests
@@ -35,7 +35,7 @@ CourseShelf is a full-stack web app for managing courses and their learning mate
    npm run dev
    ```
 
-5. Open `http://localhost:3000`.
+5. Open `http://localhost:8000`.
 
 ## Testing
 
@@ -51,11 +51,11 @@ CourseShelf is a full-stack web app for managing courses and their learning mate
 
 ## Architecture
 
-- `app/` contains the Next.js pages and API route handlers.
+- `app/` contains the React Router root module and route modules.
 - `lib/` contains validation, Prisma access, and shared constants.
 - `prisma/` contains the database schema and migrations.
 - `tests/` contains unit and end-to-end tests.
 
 ## Approach
 
-I used a single Next.js application so the frontend and backend live in one repo and share validation rules. Prisma and SQLite keep the persistence layer simple enough for a take-home project while still giving a real relational model.
+I used React Router v7 framework mode so the frontend routes and server-side loaders/actions live in one app while keeping the data flow explicit. Prisma and SQLite keep the persistence layer simple enough for a take-home project while still giving a real relational model.

@@ -6,5 +6,5 @@ export async function resetDatabase(): Promise<void> {
 }
 
 export function uniqueCourseName(): string {
-  return `Course ${Date.now()}`;
+  return `Course ${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }

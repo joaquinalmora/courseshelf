@@ -5,6 +5,8 @@ export class BasePage {
 
   async goto(path: string): Promise<void> {
     await this.page.goto(path);
-    await expect(this.page).toHaveURL(new RegExp(path === "/" ? "http://127.0.0.1:3000/?$" : path));
+
+    // Assert on the path so tests keep working if the local host or port changes.
+    await expect(this.page).toHaveURL(new RegExp(`${path === "/" ? "/?$" : `${path}$`}`));
   }
 }
