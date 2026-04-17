@@ -9,3 +9,4 @@ test-results/
 prisma/dev.db
 prisma/dev.db-journal
 decisions.md
+docs/interview/
