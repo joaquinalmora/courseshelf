@@ -1,6 +1,6 @@
 # CourseShelf
 
-CourseShelf is a full-stack web app for managing courses and their learning materials. Instructors can create courses, browse all courses on a dashboard, open a course, and add or delete linked materials.
+CourseShelf is a full-stack web app for managing courses and their learning materials. Instructors can create courses, browse all courses on a dashboard, open a course, delete a course, and add or delete linked materials.
 
 ## Stack
 
@@ -47,7 +47,7 @@ CourseShelf is a full-stack web app for managing courses and their learning mate
 - `tests/unit/validation.test.ts` validates the required course and material rules.
 - `tests/unit/constants.test.ts` validates the fixed dropdown values and term pattern used by the forms.
 - `tests/unit/route-helpers.test.ts` validates route parameter parsing for numeric ids.
-- `tests/e2e/dashboard/dashboard.spec.ts` validates the main instructor workflow from the browser.
+- `tests/e2e/dashboard/dashboard.spec.ts` validates course creation, deletion, submit-only validation, and material management from the browser.
 
 ## Architecture
 
@@ -58,4 +58,4 @@ CourseShelf is a full-stack web app for managing courses and their learning mate
 
 ## Approach
 
-I used React Router v7 framework mode so the frontend routes and server-side loaders/actions live in one app while keeping the data flow explicit. Prisma and SQLite keep the persistence layer simple enough for a take-home project while still giving a real relational model.
+I used React Router v7 framework mode so the frontend routes and server-side loaders/actions live in one app while keeping the data flow explicit. Prisma and SQLite keep the persistence layer simple enough for a take-home project while still giving a real relational model. The dashboard uses app-controlled submit validation for courses so users see consistent field-level errors without browser-native pattern interruptions while typing.

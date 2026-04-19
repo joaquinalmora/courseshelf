@@ -1,7 +1,7 @@
 ### E2E Tests: Dashboard and Course Management
 
 **Suite ID:** `DASHBOARD-E2E`
-**Feature:** Course creation, course navigation, and material management.
+**Feature:** Course creation, course deletion, course navigation, submit-only validation, and material management.
 
 ---
 
@@ -33,7 +33,63 @@
 
 ---
 
-## Test Case: `DASHBOARD-E2E-002` - Add and delete a material
+## Test Case: `DASHBOARD-E2E-002` - Delete a course from the dashboard
+
+**Priority:** `critical`
+
+**Tags:**
+- type → @e2e
+- feature → @dashboard
+
+**Description/Objective:** Confirm an instructor can remove a course directly from the dashboard.
+
+**Preconditions:**
+- Database is empty.
+
+### Flow Steps:
+1. Open the dashboard.
+2. Submit a valid course.
+3. Delete the created course.
+
+### Expected Result:
+- The created course disappears from the dashboard.
+
+### Key verification points:
+- Course name is visible before deletion.
+- Course name is not visible after deletion.
+
+---
+
+## Test Case: `DASHBOARD-E2E-003` - Submit-only course validation
+
+**Priority:** `high`
+
+**Tags:**
+- type → @e2e
+- feature → @dashboard
+
+**Description/Objective:** Confirm course validation appears after submit and is handled by the app rather than browser-native pattern UI.
+
+**Preconditions:**
+- Database is empty.
+
+### Flow Steps:
+1. Open the dashboard.
+2. Submit the empty course form.
+3. Confirm all field errors appear.
+4. Type a partial term value.
+
+### Expected Result:
+- Field errors appear after submit.
+- Browser-native pattern text does not interrupt typing.
+
+### Key verification points:
+- Course, department, and term errors are visible.
+- No browser-native pattern message appears for the partial term.
+
+---
+
+## Test Case: `DASHBOARD-E2E-004` - Add and delete a material
 
 **Priority:** `critical`
 
