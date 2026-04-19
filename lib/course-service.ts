@@ -105,6 +105,25 @@ export async function createCourse(input: CourseInput): Promise<CourseSummary> {
   return toCourseSummary(course);
 }
 
+export async function deleteCourse(courseId: number): Promise<boolean> {
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!course) {
+    return false;
+  }
+
+  await prisma.course.delete({
+    where: { id: courseId },
+  });
+
+  return true;
+}
+
 export async function createMaterial(courseId: number, input: MaterialInput): Promise<MaterialRecord> {
   const material = await prisma.material.create({
     data: {

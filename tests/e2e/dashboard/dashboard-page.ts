@@ -31,9 +31,18 @@ export class DashboardPage extends BasePage {
     await this.page.getByRole("button", { name: "Create course" }).click();
   }
 
+  async submitEmptyCourse(): Promise<void> {
+    await this.page.getByRole("button", { name: "Create course" }).click();
+  }
+
   async openCourse(courseName: string): Promise<void> {
     const courseCard = this.page.locator("article", { hasText: courseName }).first();
     await courseCard.getByRole("link", { name: "Open course" }).click();
+  }
+
+  async deleteCourse(courseName: string): Promise<void> {
+    const courseCard = this.page.locator("article", { hasText: courseName }).first();
+    await courseCard.getByRole("button", { name: "Delete course" }).click();
   }
 
   async addMaterial(input: MaterialInput): Promise<void> {
@@ -46,6 +55,14 @@ export class DashboardPage extends BasePage {
 
   async expectCourseVisible(courseName: string): Promise<void> {
     await expect(this.page.getByText(courseName)).toBeVisible();
+  }
+
+  async expectCourseNotVisible(courseName: string): Promise<void> {
+    await expect(this.page.getByText(courseName)).toHaveCount(0);
+  }
+
+  async expectCourseFieldError(message: string): Promise<void> {
+    await expect(this.page.getByText(message)).toBeVisible();
   }
 
   async expectMaterialVisible(title: string): Promise<void> {
