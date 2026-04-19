@@ -79,6 +79,16 @@ textarea {
   margin-bottom: 20px;
 }
 
+.section-heading {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+}
+
+.section-heading .eyebrow {
+  margin-bottom: 0;
+}
+
 .eyebrow {
   margin: 0 0 8px;
   color: var(--primary);
@@ -137,9 +147,9 @@ h3 {
 
 .course-card,
 .material-card {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 16px;
+  align-content: start;
 }
 
 .course-card-header,
@@ -150,6 +160,32 @@ h3 {
   gap: 12px;
   align-items: flex-start;
   flex-wrap: wrap;
+}
+
+.course-card {
+  grid-template-rows: auto auto auto 1fr auto auto;
+  min-height: 260px;
+}
+
+.course-card-title {
+  display: grid;
+  gap: 4px;
+}
+
+.course-card-pill {
+  width: fit-content;
+}
+
+.course-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: auto;
+}
+
+.course-card-actions form {
+  margin: 0;
 }
 
 .course-term {
@@ -205,6 +241,12 @@ h3 {
 
 .field-group textarea {
   resize: vertical;
+}
+
+.field-errors {
+  display: grid;
+  gap: 4px;
+  margin-top: -4px;
 }
 
 .primary-button,

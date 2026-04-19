@@ -35,6 +35,7 @@ export const meta: MetaFunction<typeof loader> = ({ data: courseData }) => {
 };
 
 export async function loader({ params }: { params: Record<string, string | undefined> }) {
+  // Route params arrive as strings, so validate before querying Prisma.
   const parsedCourseId = parseId(params.courseId ?? "");
 
   if (!parsedCourseId) {
@@ -51,6 +52,7 @@ export async function loader({ params }: { params: Record<string, string | undef
 }
 
 export async function action({ request, params }: { request: Request; params: Record<string, string | undefined> }) {
+  // Re-validate the route param for writes as well as reads.
   const parsedCourseId = parseId(params.courseId ?? "");
 
   if (!parsedCourseId) {
@@ -58,6 +60,8 @@ export async function action({ request, params }: { request: Request; params: Re
   }
 
   const formData = await request.formData();
+
+  // Use one action handler and branch by hidden form intent.
   const intent = String(formData.get("intent") ?? "");
 
   if (intent === "add-material") {
@@ -125,6 +129,8 @@ export default function CourseRoute() {
   const navigation = useNavigation();
   const submittingIntent = navigation.formData?.get("intent");
   const isAddingMaterial = navigation.state === "submitting" && submittingIntent === "add-material";
+
+  // Track the exact delete request so only that button shows a loading state.
   const deletingMaterialId =
     navigation.state === "submitting" && submittingIntent === "delete-material"
       ? parseId(String(navigation.formData?.get("materialId") ?? ""))
@@ -213,7 +219,7 @@ export default function CourseRoute() {
 
       <section className="content-section">
         <div className="section-header">
-          <div>
+          <div className="section-heading">
             <p className="eyebrow">Materials</p>
             <h2>
               {course.materials.length} item{course.materials.length === 1 ? "" : "s"}
