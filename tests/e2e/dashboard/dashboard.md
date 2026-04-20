@@ -1,117 +1,61 @@
 ### E2E Tests: Dashboard and Course Management
 
 **Suite ID:** `DASHBOARD-E2E`
-**Feature:** Course creation, course deletion, course navigation, submit-only validation, and material management.
+**Feature:** Course creation, course deletion, course navigation, submit-only validation, material management, delete-confirmation preferences, and scroll preservation.
 
 ---
 
 ## Test Case: `DASHBOARD-E2E-001` - Create and open a course
-
 **Priority:** `critical`
-
-**Tags:**
-- type → @e2e
-- feature → @dashboard
-
 **Description/Objective:** Confirm an instructor can create a course from the dashboard and open its detail page.
-
-**Preconditions:**
-- Database is empty.
-
-### Flow Steps:
-1. Open the dashboard.
-2. Submit a valid course.
-3. Open the created course.
-
-### Expected Result:
-- The new course appears on the dashboard.
-- The course detail page loads.
-
-### Key verification points:
-- Course name is visible on the dashboard.
-- The URL changes to `/courses/:id`.
-
----
+**Key verification points:** Course card becomes visible, URL changes to `/courses/:id`, course heading is visible on the detail page.
 
 ## Test Case: `DASHBOARD-E2E-002` - Delete a course from the dashboard
-
 **Priority:** `critical`
-
-**Tags:**
-- type → @e2e
-- feature → @dashboard
-
-**Description/Objective:** Confirm an instructor can remove a course directly from the dashboard.
-
-**Preconditions:**
-- Database is empty.
-
-### Flow Steps:
-1. Open the dashboard.
-2. Submit a valid course.
-3. Delete the created course.
-
-### Expected Result:
-- The created course disappears from the dashboard.
-
-### Key verification points:
-- Course name is visible before deletion.
-- Course name is not visible after deletion.
-
----
+**Description/Objective:** Confirm an instructor can delete a course from the dashboard after confirming the dialog.
+**Key verification points:** Delete dialog appears, delete action succeeds, course card disappears.
 
 ## Test Case: `DASHBOARD-E2E-003` - Submit-only course validation
-
 **Priority:** `high`
+**Description/Objective:** Confirm course validation errors appear only after submit and browser-native pattern messaging does not interrupt typing.
+**Key verification points:** Course name, department, and term errors appear after empty submit; partial term input does not show browser-native validation text.
 
-**Tags:**
-- type → @e2e
-- feature → @dashboard
+## Test Case: `DASHBOARD-E2E-004` - Submit-only material validation
+**Priority:** `high`
+**Description/Objective:** Confirm material validation errors appear only after submit and browser-native URL validation text does not interrupt typing.
+**Key verification points:** Title, description, and link errors appear after clicking Add material; typing an invalid URL does not show browser-native email-style validation text.
 
-**Description/Objective:** Confirm course validation appears after submit and is handled by the app rather than browser-native pattern UI.
-
-**Preconditions:**
-- Database is empty.
-
-### Flow Steps:
-1. Open the dashboard.
-2. Submit the empty course form.
-3. Confirm all field errors appear.
-4. Type a partial term value.
-
-### Expected Result:
-- Field errors appear after submit.
-- Browser-native pattern text does not interrupt typing.
-
-### Key verification points:
-- Course, department, and term errors are visible.
-- No browser-native pattern message appears for the partial term.
-
----
-
-## Test Case: `DASHBOARD-E2E-004` - Add and delete a material
-
+## Test Case: `DASHBOARD-E2E-005` - Add and delete a material
 **Priority:** `critical`
-
-**Tags:**
-- type → @e2e
-- feature → @dashboard
-
 **Description/Objective:** Confirm an instructor can add a material to a course and remove it again.
+**Key verification points:** Material title becomes visible after creation; delete dialog appears; material disappears after confirmation.
 
-**Preconditions:**
-- Database is empty.
+## Test Case: `DASHBOARD-E2E-006` - Disable the course delete dialog for the session
+**Priority:** `medium`
+**Description/Objective:** Confirm the course delete confirmation can be disabled for the rest of the current browser session.
+**Key verification points:** First delete shows the dialog; selecting “Don't show this again on this device” suppresses the dialog for the next course deletion in the same session.
 
-### Flow Steps:
-1. Create a course.
-2. Open the course.
-3. Submit a valid material.
-4. Delete the material.
+## Test Case: `DASHBOARD-E2E-007` - Disable the material delete dialog for the session
+**Priority:** `medium`
+**Description/Objective:** Confirm the material delete confirmation can be disabled for the rest of the current browser session.
+**Key verification points:** First material delete shows the dialog; selecting “Don't show this again on this device” suppresses the dialog for the next material deletion in the same session.
 
-### Expected Result:
-- The new material appears on the course page.
-- The deleted material disappears from the course page.
+## Test Case: `DASHBOARD-E2E-008` - Preserve scroll when deleting a material
+**Priority:** `high`
+**Description/Objective:** Confirm deleting a material keeps the user near the same scroll position on a long course page.
+**Key verification points:** Target material is removed, `window.scrollY` stays above zero, and the post-delete scroll offset stays close to the pre-delete position.
 
-### Key verification points:
-- Material title becomes visible after creation.
-- Material title is no longer visible after deletion.
+## Test Case: `DASHBOARD-E2E-009` - Preserve scroll when deleting a course
+**Priority:** `high`
+**Description/Objective:** Confirm deleting a course keeps the user near the same scroll position on a long dashboard page.
+**Key verification points:** Target course is removed, `window.scrollY` stays above zero, and the post-delete scroll offset stays close to the pre-delete position.
+
+## Test Case: `DASHBOARD-E2E-010` - Preserve scroll when adding a course
+**Priority:** `high`
+**Description/Objective:** Confirm creating a course while scrolled down does not jump the dashboard back to the top.
+**Key verification points:** New course becomes visible, `window.scrollY` stays above zero, and the post-create scroll offset stays close to the pre-submit position.
+
+## Test Case: `DASHBOARD-E2E-011` - Preserve scroll when adding a material
+**Priority:** `high`
+**Description/Objective:** Confirm adding a material while scrolled down does not jump the course page back to the top.
+**Key verification points:** New material becomes visible, `window.scrollY` stays above zero, and the post-create scroll offset stays close to the pre-submit position.
