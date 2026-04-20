@@ -37,6 +37,17 @@ CourseShelf is a full-stack web app for managing courses and their learning mate
 
 5. Open `http://localhost:8000`.
 
+### Quick start
+
+Copy and paste this block to run the full setup:
+
+```bash
+npm install
+cp .env.example .env
+npm run db:migrate
+npm run dev
+```
+
 ## Testing
 
 - `npm run test:run` runs the Vitest suite.
