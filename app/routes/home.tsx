@@ -1,6 +1,7 @@
 import { Form, Link, data, redirect, useActionData, useLoaderData, useNavigation } from "react-router";
 import type { MetaFunction } from "react-router";
 
+import { FieldErrors } from "@/app/components/field-errors";
 import { DEPARTMENT_OPTIONS } from "@/lib/constants";
 import { createCourse, deleteCourse, listCourses } from "@/lib/course-service";
 import { parseId } from "@/lib/route-helpers";
@@ -101,21 +102,22 @@ export default function HomeRoute() {
   return (
     <main className="page-shell">
       <section className="hero-card">
-        <div>
+        <div className="dashboard-summary">
           <p className="eyebrow">CourseShelf dashboard</p>
-          <h1>Manage courses and keep learning materials organized.</h1>
-          <p className="hero-copy">
-            Create a course, open it, and keep lecture notes, assignments, syllabi, and other links
-            in one place.
-          </p>
+          <h1 className="dashboard-title">Manage courses</h1>
+          <p className="dashboard-copy">Create, review, and clean up courses from one place.</p>
+
+          <div className="dashboard-stats">
+            <span className="pill">{courses.length} course{courses.length === 1 ? "" : "s"}</span>
+          </div>
         </div>
 
-        <Form className="form-card" method="post" noValidate>
+        <Form className="form-card" method="post" noValidate preventScrollReset>
           <input name="intent" type="hidden" value="create-course" />
 
           <div className="form-heading">
             <h2>Create a course</h2>
-            <p>Terms must follow the YYYYW1, YYYYW2, YYYYS1, or YYYYS2 format.</p>
+            <p>Use format `YYYY[W|S][1|2]`, for example `2026W1` or `1999S2`.</p>
           </div>
 
           <label className="field-group">
@@ -128,15 +130,7 @@ export default function HomeRoute() {
               placeholder="Introduction to AI"
             />
           </label>
-          {fieldErrors.courseName ? (
-            <div className="field-errors" id="course-name-errors">
-              {fieldErrors.courseName.map((message) => (
-                <p className="error-message" key={message}>
-                  {message}
-                </p>
-              ))}
-            </div>
-          ) : null}
+          <FieldErrors id="course-name-errors" messages={fieldErrors.courseName} />
 
           <label className="field-group">
             <span>Department</span>
@@ -154,15 +148,7 @@ export default function HomeRoute() {
               ))}
             </select>
           </label>
-          {fieldErrors.department ? (
-            <div className="field-errors" id="department-errors">
-              {fieldErrors.department.map((message) => (
-                <p className="error-message" key={message}>
-                  {message}
-                </p>
-              ))}
-            </div>
-          ) : null}
+          <FieldErrors id="department-errors" messages={fieldErrors.department} />
 
           <label className="field-group">
             <span>Term</span>
@@ -174,15 +160,7 @@ export default function HomeRoute() {
               placeholder="2026W1"
             />
           </label>
-          {fieldErrors.term ? (
-            <div className="field-errors" id="term-errors">
-              {fieldErrors.term.map((message) => (
-                <p className="error-message" key={message}>
-                  {message}
-                </p>
-              ))}
-            </div>
-          ) : null}
+          <FieldErrors id="term-errors" messages={fieldErrors.term} />
 
           <button className="primary-button" disabled={isCreatingCourse} type="submit">
             {isCreatingCourse ? "Saving..." : "Create course"}
@@ -225,7 +203,7 @@ export default function HomeRoute() {
                     Open course
                   </Link>
 
-                  <Form method="post">
+                  <Form method="post" preventScrollReset>
                     <input name="intent" type="hidden" value="delete-course" />
                     <input name="courseId" type="hidden" value={course.id} />
                     <button className="secondary-button" disabled={deletingCourseId === course.id} type="submit">

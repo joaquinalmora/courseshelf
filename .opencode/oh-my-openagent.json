@@ -1,0 +1,6 @@
+{
+  "git_master_config": {
+    "commit_footer": false,
+    "include_co_authored_by": false
+  }
+}

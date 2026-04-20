@@ -72,4 +72,9 @@ export class DashboardPage extends BasePage {
   async deleteFirstMaterial(): Promise<void> {
     await this.page.getByRole("button", { name: "Delete material" }).first().click();
   }
+
+  async deleteMaterial(title: string): Promise<void> {
+    const materialCard = this.page.locator("article", { hasText: title }).first();
+    await materialCard.getByRole("button", { name: "Delete material" }).click();
+  }
 }

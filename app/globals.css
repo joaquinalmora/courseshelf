@@ -119,6 +119,7 @@ h3 {
 }
 
 .hero-copy,
+.dashboard-copy,
 .muted-copy,
 .material-description,
 .form-heading p,
@@ -129,6 +130,24 @@ h3 {
 
 .hero-copy {
   margin-top: 18px;
+}
+
+.dashboard-summary {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+.dashboard-title {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  line-height: 1.1;
+}
+
+.dashboard-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
 }
 
 .course-grid,

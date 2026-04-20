@@ -4,24 +4,30 @@ import {
   data,
   redirect,
   useActionData,
+  useFetcher,
   useLoaderData,
   useNavigation,
 } from "react-router";
 import type { MetaFunction } from "react-router";
 
+import { FieldErrors } from "@/app/components/field-errors";
 import { MATERIAL_TYPE_OPTIONS } from "@/lib/constants";
 import { createMaterial, deleteMaterial, getCourseById } from "@/lib/course-service";
 import { parseId } from "@/lib/route-helpers";
-import { formatValidationError, materialSchema } from "@/lib/validation";
+import { materialSchema } from "@/lib/validation";
+
+interface MaterialFormValues {
+  title: string;
+  type: string;
+  description: string;
+  link: string;
+}
 
 interface CourseActionData {
-  addErrorMessage?: string;
-  addValues?: {
-    title: string;
-    type: string;
-    description: string;
-    link: string;
-  };
+  fieldErrors?: Partial<Record<keyof MaterialFormValues, string[]>>;
+  addValues?: MaterialFormValues;
+  deletedCourseId?: number;
+  deletedMaterialId?: number;
   deleteErrorMessage?: string;
   deleteErrorMaterialId?: number;
 }
@@ -65,7 +71,7 @@ export async function action({ request, params }: { request: Request; params: Re
   const intent = String(formData.get("intent") ?? "");
 
   if (intent === "add-material") {
-    const values = {
+    const values: MaterialFormValues = {
       title: String(formData.get("title") ?? ""),
       type: String(formData.get("type") ?? MATERIAL_TYPE_OPTIONS[0]),
       description: String(formData.get("description") ?? ""),
@@ -77,7 +83,7 @@ export async function action({ request, params }: { request: Request; params: Re
     if (!validationResult.success) {
       return data<CourseActionData>(
         {
-          addErrorMessage: formatValidationError(validationResult.error),
+          fieldErrors: validationResult.error.flatten().fieldErrors,
           addValues: values,
         },
         { status: 400 },
@@ -102,7 +108,7 @@ export async function action({ request, params }: { request: Request; params: Re
 
     const deletedCourseId = await deleteMaterial(parsedMaterialId);
 
-    if (!deletedCourseId) {
+      if (!deletedCourseId) {
       return data<CourseActionData>(
         {
           deleteErrorMessage: "Material not found.",
@@ -112,13 +118,11 @@ export async function action({ request, params }: { request: Request; params: Re
       );
     }
 
-    return redirect(`/courses/${deletedCourseId}`);
+    return data<CourseActionData>({ deletedMaterialId: parsedMaterialId, deletedCourseId });
   }
 
   return data<CourseActionData>(
-    {
-      addErrorMessage: "Unknown action.",
-    },
+    {},
     { status: 400 },
   );
 }
@@ -127,14 +131,9 @@ export default function CourseRoute() {
   const { course } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
+  const fieldErrors = actionData?.fieldErrors ?? {};
   const submittingIntent = navigation.formData?.get("intent");
   const isAddingMaterial = navigation.state === "submitting" && submittingIntent === "add-material";
-
-  // Track the exact delete request so only that button shows a loading state.
-  const deletingMaterialId =
-    navigation.state === "submitting" && submittingIntent === "delete-material"
-      ? parseId(String(navigation.formData?.get("materialId") ?? ""))
-      : null;
 
   return (
     <main className="page-shell">
@@ -154,7 +153,7 @@ export default function CourseRoute() {
           </div>
         </div>
 
-        <Form className="form-card" method="post">
+        <Form className="form-card" method="post" noValidate preventScrollReset>
           <input name="intent" type="hidden" value="add-material" />
 
           <div className="form-heading">
@@ -165,16 +164,23 @@ export default function CourseRoute() {
           <label className="field-group">
             <span>Title</span>
             <input
+              aria-describedby={fieldErrors.title ? "material-title-errors" : undefined}
+              aria-invalid={fieldErrors.title ? true : undefined}
               defaultValue={actionData?.addValues?.title ?? ""}
               name="title"
               placeholder="Week 1 notes"
-              required
             />
           </label>
+          <FieldErrors id="material-title-errors" messages={fieldErrors.title} />
 
           <label className="field-group">
             <span>Type</span>
-            <select defaultValue={actionData?.addValues?.type ?? MATERIAL_TYPE_OPTIONS[0]} name="type" required>
+            <select
+              aria-describedby={fieldErrors.type ? "material-type-errors" : undefined}
+              aria-invalid={fieldErrors.type ? true : undefined}
+              defaultValue={actionData?.addValues?.type ?? MATERIAL_TYPE_OPTIONS[0]}
+              name="type"
+            >
               {MATERIAL_TYPE_OPTIONS.map((materialType) => (
                 <option key={materialType} value={materialType}>
                   {materialType}
@@ -182,38 +188,36 @@ export default function CourseRoute() {
               ))}
             </select>
           </label>
+          <FieldErrors id="material-type-errors" messages={fieldErrors.type} />
 
           <label className="field-group">
             <span>Description</span>
             <textarea
+              aria-describedby={fieldErrors.description ? "material-description-errors" : undefined}
+              aria-invalid={fieldErrors.description ? true : undefined}
               defaultValue={actionData?.addValues?.description ?? ""}
               name="description"
               placeholder="Foundational reading for the first week."
-              required
               rows={3}
             />
           </label>
+          <FieldErrors id="material-description-errors" messages={fieldErrors.description} />
 
           <label className="field-group">
             <span>Link</span>
             <input
+              aria-describedby={fieldErrors.link ? "material-link-errors" : undefined}
+              aria-invalid={fieldErrors.link ? true : undefined}
               defaultValue={actionData?.addValues?.link ?? ""}
               name="link"
               placeholder="https://example.com/week-1"
-              required
-              type="url"
             />
           </label>
+          <FieldErrors id="material-link-errors" messages={fieldErrors.link} />
 
           <button className="primary-button" disabled={isAddingMaterial} type="submit">
             {isAddingMaterial ? "Saving..." : "Add material"}
           </button>
-
-          {actionData?.addErrorMessage ? (
-            <p className="error-message" role="alert">
-              {actionData.addErrorMessage}
-            </p>
-          ) : null}
         </Form>
       </section>
 
@@ -235,43 +239,60 @@ export default function CourseRoute() {
         ) : (
           <div className="material-grid">
             {course.materials.map((material) => (
-              <article className="material-card" key={material.id}>
-                <div className="material-card-header">
-                  <div>
-                    <p className="course-term">{material.type}</p>
-                    <h3>{material.title}</h3>
-                  </div>
-
-                  <div className="delete-action">
-                    <Form method="post">
-                      <input name="intent" type="hidden" value="delete-material" />
-                      <input name="materialId" type="hidden" value={material.id} />
-                      <button
-                        className="secondary-button"
-                        disabled={deletingMaterialId === material.id}
-                        type="submit"
-                      >
-                        {deletingMaterialId === material.id ? "Removing..." : "Delete material"}
-                      </button>
-                    </Form>
-
-                    {actionData?.deleteErrorMaterialId === material.id && actionData.deleteErrorMessage ? (
-                      <p className="error-message" role="alert">
-                        {actionData.deleteErrorMessage}
-                      </p>
-                    ) : null}
-                  </div>
-                </div>
-
-                <p className="material-description">{material.description}</p>
-                <a className="primary-link" href={material.link} rel="noreferrer" target="_blank">
-                  Open material
-                </a>
-              </article>
+              <MaterialCard key={material.id} material={material} />
             ))}
           </div>
         )}
       </section>
     </main>
+  );
+}
+
+function MaterialCard({
+  material,
+}: {
+  material: {
+    id: number;
+    type: string;
+    title: string;
+    description: string;
+    link: string;
+  };
+}) {
+  const deleteFetcher = useFetcher<CourseActionData>();
+  const isDeleting = deleteFetcher.state !== "idle";
+  const deleteError =
+    deleteFetcher.data?.deleteErrorMaterialId === material.id ? deleteFetcher.data.deleteErrorMessage : undefined;
+
+  return (
+    <article className="material-card">
+      <div className="material-card-header">
+        <div>
+          <p className="course-term">{material.type}</p>
+          <h3>{material.title}</h3>
+        </div>
+
+        <div className="delete-action">
+          <deleteFetcher.Form method="post">
+            <input name="intent" type="hidden" value="delete-material" />
+            <input name="materialId" type="hidden" value={material.id} />
+            <button className="secondary-button" disabled={isDeleting} type="submit">
+              {isDeleting ? "Removing..." : "Delete material"}
+            </button>
+          </deleteFetcher.Form>
+
+          {deleteError ? (
+            <p className="error-message" role="alert">
+              {deleteError}
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      <p className="material-description">{material.description}</p>
+      <a className="primary-link" href={material.link} rel="noreferrer" target="_blank">
+        Open material
+      </a>
+    </article>
   );
 }
