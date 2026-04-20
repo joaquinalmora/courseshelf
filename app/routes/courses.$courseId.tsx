@@ -10,6 +10,7 @@ import {
 } from "react-router";
 import type { MetaFunction } from "react-router";
 
+import { DeleteConfirmationButton } from "@/app/components/delete-confirmation-button";
 import { FieldErrors } from "@/app/components/field-errors";
 import { MATERIAL_TYPE_OPTIONS } from "@/lib/constants";
 import { createMaterial, deleteMaterial, getCourseById } from "@/lib/course-service";
@@ -108,7 +109,7 @@ export async function action({ request, params }: { request: Request; params: Re
 
     const deletedCourseId = await deleteMaterial(parsedMaterialId);
 
-      if (!deletedCourseId) {
+    if (!deletedCourseId) {
       return data<CourseActionData>(
         {
           deleteErrorMessage: "Material not found.",
@@ -276,9 +277,15 @@ function MaterialCard({
           <deleteFetcher.Form method="post">
             <input name="intent" type="hidden" value="delete-material" />
             <input name="materialId" type="hidden" value={material.id} />
-            <button className="secondary-button" disabled={isDeleting} type="submit">
-              {isDeleting ? "Removing..." : "Delete material"}
-            </button>
+            <DeleteConfirmationButton
+              buttonLabel="Delete material"
+              confirmActionLabel="Delete material"
+              confirmDescription="This will permanently remove this material from the course."
+              confirmTitle="Delete this material?"
+              isSubmitting={isDeleting}
+              pendingLabel="Removing..."
+              preferenceKey="courseshelf:skip-material-delete-confirmation"
+            />
           </deleteFetcher.Form>
 
           {deleteError ? (

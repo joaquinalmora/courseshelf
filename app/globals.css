@@ -322,6 +322,63 @@ h3 {
   gap: 8px;
 }
 
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(16, 24, 40, 0.45);
+}
+
+.dialog-card {
+  width: min(100%, 440px);
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.dialog-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.dialog-copy p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.dialog-title {
+  font-size: 1.35rem;
+}
+
+.dialog-checkbox {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: var(--muted);
+}
+
+.dialog-checkbox input {
+  margin-top: 2px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.danger-button {
+  background: var(--danger);
+}
+
 .error-message {
   color: var(--danger);
 }

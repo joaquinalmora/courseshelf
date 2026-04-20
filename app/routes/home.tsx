@@ -1,6 +1,7 @@
 import { Form, Link, data, redirect, useActionData, useLoaderData, useNavigation } from "react-router";
 import type { MetaFunction } from "react-router";
 
+import { DeleteConfirmationButton } from "@/app/components/delete-confirmation-button";
 import { FieldErrors } from "@/app/components/field-errors";
 import { DEPARTMENT_OPTIONS } from "@/lib/constants";
 import { createCourse, deleteCourse, listCourses } from "@/lib/course-service";
@@ -206,9 +207,15 @@ export default function HomeRoute() {
                   <Form method="post" preventScrollReset>
                     <input name="intent" type="hidden" value="delete-course" />
                     <input name="courseId" type="hidden" value={course.id} />
-                    <button className="secondary-button" disabled={deletingCourseId === course.id} type="submit">
-                      {deletingCourseId === course.id ? "Removing..." : "Delete course"}
-                    </button>
+                    <DeleteConfirmationButton
+                      buttonLabel="Delete course"
+                      confirmActionLabel="Delete course"
+                      confirmDescription="This will permanently remove the course and all of its linked materials."
+                      confirmTitle="Delete this course?"
+                      isSubmitting={deletingCourseId === course.id}
+                      pendingLabel="Removing..."
+                      preferenceKey="courseshelf:skip-course-delete-confirmation"
+                    />
                   </Form>
                 </div>
 

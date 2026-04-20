@@ -43,6 +43,7 @@ export class DashboardPage extends BasePage {
   async deleteCourse(courseName: string): Promise<void> {
     const courseCard = this.page.locator("article", { hasText: courseName }).first();
     await courseCard.getByRole("button", { name: "Delete course" }).click();
+    await this.confirmDelete();
   }
 
   async addMaterial(input: MaterialInput): Promise<void> {
@@ -71,10 +72,29 @@ export class DashboardPage extends BasePage {
 
   async deleteFirstMaterial(): Promise<void> {
     await this.page.getByRole("button", { name: "Delete material" }).first().click();
+    await this.confirmDelete();
   }
 
   async deleteMaterial(title: string): Promise<void> {
     const materialCard = this.page.locator("article", { hasText: title }).first();
     await materialCard.getByRole("button", { name: "Delete material" }).click();
+    await this.confirmDelete();
+  }
+
+  async confirmDelete(): Promise<void> {
+    await this.page.locator('[role="dialog"]').getByRole("button", { name: /Delete (course|material)/ }).click();
+  }
+
+  async confirmDeleteAndDontShowAgain(): Promise<void> {
+    await this.page.getByLabel("Don't show this again on this device").check();
+    await this.confirmDelete();
+  }
+
+  async expectDeleteDialog(title: string): Promise<void> {
+    await expect(this.page.getByRole("heading", { name: title })).toBeVisible();
+  }
+
+  async expectDeleteDialogHidden(title: string): Promise<void> {
+    await expect(this.page.getByRole("heading", { name: title })).toHaveCount(0);
   }
 }

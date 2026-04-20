@@ -40,7 +40,10 @@ test.describe("Dashboard", () => {
     });
 
     await dashboardPage.expectCourseVisible(courseName);
-    await dashboardPage.deleteCourse(courseName);
+    const courseCard = page.locator("article", { hasText: courseName }).first();
+    await courseCard.getByRole("button", { name: "Delete course" }).click();
+    await dashboardPage.expectDeleteDialog("Delete this course?");
+    await dashboardPage.confirmDelete();
     await dashboardPage.expectCourseNotVisible(courseName);
   });
 
@@ -102,9 +105,79 @@ test.describe("Dashboard", () => {
     });
 
     await dashboardPage.expectMaterialVisible("Week 1 Notes");
-    await dashboardPage.deleteFirstMaterial();
+    await page.getByRole("button", { name: "Delete material" }).first().click();
+    await dashboardPage.expectDeleteDialog("Delete this material?");
+    await dashboardPage.confirmDelete();
 
     await expect(page.getByText("Week 1 Notes")).not.toBeVisible();
+  });
+
+  test("course delete dialog can be disabled for the rest of the session", async ({ page }) => {
+    const dashboardPage = new DashboardPage(page);
+    const firstCourse = uniqueCourseName();
+    const secondCourse = uniqueCourseName();
+
+    await dashboardPage.gotoDashboard();
+
+    await dashboardPage.createCourse({
+      courseName: firstCourse,
+      department: "English",
+      term: "2026W1",
+    });
+
+    await dashboardPage.createCourse({
+      courseName: secondCourse,
+      department: "English",
+      term: "2026W2",
+    });
+
+    const firstCourseCard = page.locator("article", { hasText: firstCourse }).first();
+    await firstCourseCard.getByRole("button", { name: "Delete course" }).click();
+    await dashboardPage.expectDeleteDialog("Delete this course?");
+    await dashboardPage.confirmDeleteAndDontShowAgain();
+    await dashboardPage.expectCourseNotVisible(firstCourse);
+
+    const secondCourseCard = page.locator("article", { hasText: secondCourse }).first();
+    await secondCourseCard.getByRole("button", { name: "Delete course" }).click();
+    await dashboardPage.expectDeleteDialogHidden("Delete this course?");
+    await dashboardPage.expectCourseNotVisible(secondCourse);
+  });
+
+  test("material delete dialog can be disabled for the rest of the session", async ({ page }) => {
+    const dashboardPage = new DashboardPage(page);
+    const courseName = uniqueCourseName();
+
+    await dashboardPage.gotoDashboard();
+    await dashboardPage.createCourse({
+      courseName,
+      department: "Physics",
+      term: "2026S2",
+    });
+    await dashboardPage.openCourse(courseName);
+
+    await dashboardPage.addMaterial({
+      title: "Week 1 Notes",
+      type: "Lecture Notes",
+      description: "Introductory concepts for the first week.",
+      link: "https://example.com/week-1-notes",
+    });
+
+    await dashboardPage.addMaterial({
+      title: "Week 2 Notes",
+      type: "Lecture Notes",
+      description: "Second-week concepts.",
+      link: "https://example.com/week-2-notes",
+    });
+
+    await page.getByRole("button", { name: "Delete material" }).first().click();
+    await dashboardPage.expectDeleteDialog("Delete this material?");
+    await dashboardPage.confirmDeleteAndDontShowAgain();
+    await expect(page.getByText("Week 1 Notes")).toHaveCount(0);
+
+    const secondMaterialCard = page.locator("article", { hasText: "Week 2 Notes" }).first();
+    await secondMaterialCard.getByRole("button", { name: "Delete material" }).click();
+    await dashboardPage.expectDeleteDialogHidden("Delete this material?");
+    await expect(page.getByText("Week 2 Notes")).toHaveCount(0);
   });
 
   test("deleting a material keeps the current scroll position", async ({ page }) => {
